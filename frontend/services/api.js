@@ -1,18 +1,8 @@
 import axios from 'axios';
-
-const getBaseURL = () => {
-  const envUrl = import.meta.env.VITE_API_URL;
-  if (!import.meta.env.PROD && !envUrl) {
-    return 'http://localhost:5001/api';
-  }
-  if (import.meta.env.PROD && (!envUrl || envUrl.includes('localhost'))) {
-    return '/api';
-  }
-  return (envUrl || '') + '/api';
-};
+import { getApiBaseUrl } from './runtime';
 
 const api = axios.create({
-  baseURL: getBaseURL(),
+  baseURL: getApiBaseUrl(),
 });
 
 api.interceptors.request.use((config) => {

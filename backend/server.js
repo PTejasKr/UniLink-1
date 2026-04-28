@@ -29,9 +29,38 @@ import path from 'path';
 const app = express();
 const server = http.createServer(app);
 
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  process.env.CLIENT_URL,
+  process.env.URL,
+  process.env.DEPLOY_PRIME_URL,
+  process.env.DEPLOY_URL,
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+].filter(Boolean);
+
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true;
+  if (allowedOrigins.includes(origin)) return true;
+  return /^https:\/\/[a-z0-9-]+\.netlify\.app$/i.test(origin);
+};
+
+const corsOptions = {
+  origin(origin, callback) {
+    if (isAllowedOrigin(origin)) {
+      callback(null, true);
+      return;
+    }
+    callback(new Error(`Origin ${origin} not allowed by CORS`));
+  },
+  credentials: true,
+};
+
 const io = new Server(server, {
   cors: {
-    origin: '*',
+    ...corsOptions,
     methods: ['GET', 'POST'],
   },
 });
@@ -76,7 +105,7 @@ io.on('connection', (socket) => {
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+app.use(cors(corsOptions));
 
 // Serve Static Files (local uploads for dev)
 const __dirname = path.resolve();

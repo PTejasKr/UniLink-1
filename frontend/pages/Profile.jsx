@@ -13,6 +13,7 @@ import { toast } from 'react-toastify';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useChat } from '../context/ChatContext';
 import ImageCropModal from '../components/ImageCropModal';
+import { resolveMediaUrl } from '../services/media';
 
 const MotionDiv = motion.div;
 
@@ -354,10 +355,7 @@ const Profile = () => {
   const getProfilePicUrl = (u) => {
     if (!u) return '';
     if (u.profilePic) {
-      if (u.profilePic.startsWith('http')) return u.profilePic;
-      return u.profilePic.startsWith('/uploads')
-        ? `${import.meta.env.VITE_API_URL || ''}${u.profilePic}`
-        : u.profilePic;
+      return resolveMediaUrl(u.profilePic);
     }
     return `https://api.dicebear.com/7.x/thumbs/svg?seed=${encodeURIComponent(u.name || 'user')}&backgroundColor=ffd5dc,b6e3f4,c0aede`;
   };
@@ -365,10 +363,7 @@ const Profile = () => {
   // ── Banner URL helper
   const getBannerUrl = (u) => {
     if (!u?.bannerImage) return null;
-    if (u.bannerImage.startsWith('http')) return u.bannerImage;
-    return u.bannerImage.startsWith('/uploads')
-      ? `${import.meta.env.VITE_API_URL || ''}${u.bannerImage}`
-      : u.bannerImage;
+    return resolveMediaUrl(u.bannerImage);
   };
 
   // ── Format join date

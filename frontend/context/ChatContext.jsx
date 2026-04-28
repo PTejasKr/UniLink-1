@@ -2,19 +2,9 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { io } from 'socket.io-client';
 import { useAuth } from './AuthContext';
 import api from '../services/api';
+import { getBackendOrigin } from '../services/runtime';
 
 const ChatContext = createContext();
-
-const getSocketUrl = () => {
-    const envUrl = import.meta.env.VITE_API_URL;
-    if (envUrl) {
-        return envUrl;
-    }
-    if (!import.meta.env.PROD) {
-        return 'http://localhost:5001';
-    }
-    return window.location.origin;
-};
 
 export const ChatProvider = ({ children }) => {
     const { user } = useAuth();
@@ -25,7 +15,9 @@ export const ChatProvider = ({ children }) => {
 
     useEffect(() => {
         if (user) {
-            const newSocket = io(getSocketUrl());
+            const newSocket = io(getBackendOrigin(), {
+                withCredentials: true,
+            });
             setSocket(newSocket);
 
             newSocket.emit('join', user._id);

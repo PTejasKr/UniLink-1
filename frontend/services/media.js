@@ -1,4 +1,6 @@
-const API_ORIGIN = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+import { getBackendOrigin } from './runtime';
+
+const API_ORIGIN = getBackendOrigin();
 
 export const resolveMediaUrl = (value) => {
   if (!value) return '';
